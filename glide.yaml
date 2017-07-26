@@ -1,0 +1,3 @@
+package: github.com/kcmerrill/vbq
+import:
+- package: gopkg.in/yaml.v2
