@@ -62,12 +62,12 @@ func newQ(qConfigFile string) {
 		q.WorkerInfo.Count = 10
 	}
 
-	if q.CompletedQ == "" {
-		q.CompletedQ = ".completed"
+	if q.QueueInfo.CompletedQ == "" {
+		q.QueueInfo.CompletedQ = ".completed"
 	}
 
-	if q.FailedQ == "" {
-		q.FailedQ = ".failed"
+	if q.QueueInfo.FailedQ == "" {
+		q.QueueInfo.FailedQ = ".failed"
 	}
 
 	// spin up our workers
@@ -76,8 +76,8 @@ func newQ(qConfigFile string) {
 	}
 
 	// create failed/completed folders
-	os.Mkdir(q.TasksDir+"/"+q.CompletedQ, 0755)
-	os.Mkdir(q.TasksDir+"/"+q.FailedQ, 0755)
+	os.Mkdir(q.TasksDir+"/"+q.QueueInfo.CompletedQ, 0755)
+	os.Mkdir(q.TasksDir+"/"+q.QueueInfo.FailedQ, 0755)
 
 	// load up our tasks
 	tasks, loadTasksErr := ioutil.ReadDir(q.TasksDir)
@@ -114,10 +114,12 @@ type queue struct {
 	TasksDir   string
 
 	// queues to place messages
-	Q          chan task
-	ShutdownQ  chan bool
-	FailedQ    string `yaml:"failed.q"`
-	CompletedQ string `yaml:"completed.q"`
+	Q         chan task
+	ShutdownQ chan bool
+	QueueInfo struct {
+		FailedQ    string `yaml:"failed"`
+		CompletedQ string `yaml:"completed"`
+	} `yaml:"queue"`
 
 	// worker information
 	WorkerInfo struct {
@@ -142,9 +144,9 @@ func (q *queue) work(id int) {
 }
 
 func (q *queue) complete(task task) {
-	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.CompletedQ+"/"+task.Name)
+	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.QueueInfo.CompletedQ+"/"+task.Name)
 }
 
 func (q *queue) fail(task task) {
-	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.FailedQ+"/"+task.Name)
+	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.QueueInfo.FailedQ+"/"+task.Name)
 }
