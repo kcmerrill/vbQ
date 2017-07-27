@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	"os"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -21,15 +23,15 @@ func findQs(dir string) []string {
 }
 
 func loadQs(qs []string) {
-	var wg sync.WaitGroup
+	var wgQ sync.WaitGroup
 	for _, q := range qs {
-		wg.Add(1)
+		wgQ.Add(1)
 		go func(q string) {
-			defer wg.Done()
+			defer wgQ.Done()
 			newQ(q)
 		}(q)
 	}
-	wg.Wait()
+	wgQ.Wait()
 }
 
 func newQ(qConfigFile string) {
@@ -65,6 +67,10 @@ func newQ(qConfigFile string) {
 		go q.work(worker)
 	}
 
+	// create failed/completed folders
+	os.Mkdir(q.TasksDir+"/"+q.CompletedQ, 0755)
+	os.Mkdir(q.TasksDir+"/"+q.FailedQ, 0755)
+
 	// load up our tasks
 	tasks, loadTasksErr := ioutil.ReadDir(q.TasksDir)
 	if loadTasksErr != nil {
@@ -80,6 +86,7 @@ func newQ(qConfigFile string) {
 		// Inject our task
 		q.Q <- task{
 			File: q.TasksDir + "/" + taskInfo.Name(),
+			Q:    q.Name,
 			CMD:  q.WorkerInfo.CMD,
 		}
 	}
@@ -115,9 +122,19 @@ func (q *queue) work(id int) {
 	for {
 		select {
 		case <-q.ShutdownQ:
-			break
+			return
 		case task := <-q.Q:
-			task.run()
+			if task.run() {
+				q.complete(task)
+			} else {
+				q.fail(task)
+			}
 		}
 	}
+}
+
+func (q *queue) complete(task task) {
+}
+
+func (q *queue) fail(task task) {
 }
