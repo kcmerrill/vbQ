@@ -62,6 +62,14 @@ func newQ(qConfigFile string) {
 		q.WorkerInfo.Count = 10
 	}
 
+	if q.CompletedQ == "" {
+		q.CompletedQ = ".completed"
+	}
+
+	if q.FailedQ == "" {
+		q.FailedQ = ".failed"
+	}
+
 	// spin up our workers
 	for worker := 0; worker < q.WorkerInfo.Count; worker++ {
 		go q.work(worker)
@@ -134,7 +142,9 @@ func (q *queue) work(id int) {
 }
 
 func (q *queue) complete(task task) {
+	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.CompletedQ+"/"+task.Name)
 }
 
 func (q *queue) fail(task task) {
+	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.FailedQ+"/"+task.Name)
 }
