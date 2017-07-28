@@ -2,6 +2,7 @@ package main
 
 import "os/exec"
 
+// POC. Refactor please
 type git struct {
 }
 
