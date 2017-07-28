@@ -12,11 +12,12 @@ import (
 )
 
 type task struct {
-	Name string
-	File string
-	Q    string
-	CMD  string
-	Args map[string]string `yaml:",inline"`
+	Name     string
+	File     string
+	Q        string
+	CMD      string
+	Args     map[string]string `yaml:",inline"`
+	Contents string
 }
 
 func (t *task) run() bool {
@@ -25,6 +26,7 @@ func (t *task) run() bool {
 
 	// yaml?
 	contents, _ := ioutil.ReadFile(t.File)
+	t.Contents = string(contents)
 
 	// parse
 	yaml.Unmarshal([]byte(contents), &t.Args)
