@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"os/exec"
@@ -33,7 +34,10 @@ func (t *task) run() bool {
 	// nor are we sure if we really needed to unmarshal anything
 	// the true test will be if any of those args gets used
 	// elsewhere
-	tmpl, parseErr := template.New("params").Parse(t.CMD)
+	fns := template.FuncMap{
+		"task": taskParams,
+	}
+	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
 		log("failed[template]", t.Q+":"+t.Name)
 		return false
@@ -58,4 +62,12 @@ func (t *task) run() bool {
 	// success! #lifegoals
 	log("completed", t.Q+":"+t.Name)
 	return true
+}
+
+func taskParams(m map[string]string, key string) (interface{}, error) {
+	val, ok := m[key]
+	if !ok {
+		return nil, errors.New("missing key " + key)
+	}
+	return val, nil
 }

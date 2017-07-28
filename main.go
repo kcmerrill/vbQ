@@ -1,5 +1,11 @@
 package main
 
+import "os"
+
 func main() {
-	loadQs(findQs("/tmp/q/"))
+	os.Chdir(".")
+	versionControl().init()
+	startQs(findQs("."))
+	flushLogs(".")
+	versionControl().push()
 }

@@ -16,25 +16,33 @@ func findQs(dir string) []string {
 	dir = strings.TrimRight(dir, "/")
 
 	// scan
-	files, _ := filepath.Glob(dir + "/*/.q")
+	files, _ := filepath.Glob(dir + "/**/.q")
 
 	// return
 	return files
 }
 
-func loadQs(qs []string) {
-	var wgQ sync.WaitGroup
+func startQs(qs []string) bool {
+	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
+
 	for _, q := range qs {
 		wgQ.Add(1)
 		go func(q string) {
 			defer wgQ.Done()
-			newQ(q)
+			_, wasFailures := newQ(q)
+			if wasFailures {
+				wgQLock.Lock()
+				failures = true
+				wgQLock.Unlock()
+			}
 		}(q)
 	}
 	wgQ.Wait()
+
+	return failures
 }
 
-func newQ(qConfigFile string) {
+func newQ(qConfigFile string) (bool, bool) {
 	// initalize
 	q := queue{
 		Name:       filepath.Base(filepath.Dir(qConfigFile)),
@@ -42,13 +50,15 @@ func newQ(qConfigFile string) {
 		ConfigFile: qConfigFile,
 		Q:          make(chan task),
 		ShutdownQ:  make(chan bool),
+		lock:       &sync.Mutex{},
 	}
 
 	// fetch the file
 	contents, configReadErr := ioutil.ReadFile(q.ConfigFile)
 	if configReadErr != nil {
 		log("fatal", "Unable to read in q config for '"+q.ConfigFile+"'")
-		return
+		// do not rerun, and exit 1
+		return false, false
 	}
 
 	// parse
@@ -59,15 +69,11 @@ func newQ(qConfigFile string) {
 
 	// defaults
 	if q.WorkerInfo.Count == 0 {
-		q.WorkerInfo.Count = 10
+		q.WorkerInfo.Count = 1
 	}
 
 	if q.QueueInfo.CompletedQ == "" {
 		q.QueueInfo.CompletedQ = ".completed"
-	}
-
-	if q.QueueInfo.FailedQ == "" {
-		q.QueueInfo.FailedQ = ".failed"
 	}
 
 	// spin up our workers
@@ -86,8 +92,8 @@ func newQ(qConfigFile string) {
 	}
 
 	for _, taskInfo := range tasks {
-		// skip over . files, also directories
-		if strings.HasPrefix(taskInfo.Name(), ".") || taskInfo.IsDir() {
+		// skip over . files, also directories and README's
+		if strings.ToLower(taskInfo.Name()) == "readme.md" || strings.HasPrefix(taskInfo.Name(), ".") || taskInfo.IsDir() {
 			continue
 		}
 
@@ -96,6 +102,7 @@ func newQ(qConfigFile string) {
 			File: q.TasksDir + "/" + taskInfo.Name(),
 			Q:    q.Name,
 			CMD:  q.WorkerInfo.CMD,
+			Args: make(map[string]string),
 		}
 	}
 
@@ -103,15 +110,20 @@ func newQ(qConfigFile string) {
 	for shutdown := 0; shutdown < q.WorkerInfo.Count; shutdown++ {
 		q.ShutdownQ <- true
 	}
+
+	// well?
+	return false, q.wasFailures
 }
 
 // queue contains information about specific queue
 type queue struct {
 	// basics
-	Name       string `yaml:"name"`
-	Desc       string `yaml:"description"`
-	ConfigFile string
-	TasksDir   string
+	Name        string `yaml:"name"`
+	Desc        string `yaml:"description"`
+	ConfigFile  string
+	TasksDir    string
+	wasFailures bool
+	lock        *sync.Mutex
 
 	// queues to place messages
 	Q         chan task
@@ -148,5 +160,13 @@ func (q *queue) complete(task task) {
 }
 
 func (q *queue) fail(task task) {
-	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.QueueInfo.FailedQ+"/"+task.Name)
+	// bad status :(
+	q.lock.Lock()
+	q.wasFailures = true
+	q.lock.Unlock()
+
+	// if failedq not setup, tasks will stay to be reprocessed
+	if q.QueueInfo.FailedQ != "" {
+		os.Rename(task.File, filepath.Dir(task.File)+"/"+q.QueueInfo.FailedQ+"/"+task.Name)
+	}
 }
