@@ -56,5 +56,10 @@ Just remember, this is a proof of concept. Having said that, here are some proti
 1. Your build system should only allow for 1 build at a time and _NOT_ setup for multiple builds concurrently.
 1. Be creative. Use the key=value pairs, or use the whole file contents for stdin for a custom application.
 1. To rerun the messages again, simply copy the correct files back to the top level of the queue
+1. dotfiles/README.md/folders are all ignored and not considered tasks. Only files. Even zips. Be creative.
+1. Speaking of readme files, place a README.md on the same level as your `.q` file and put a basic message template in place so those creating the PR's can just copy paste without leaving github.
+1. Take a peek at [vbq-tasks](https://github.com/kcmerrill/vbq-tasks) for a quick example of what it might look like.
+1. vbQ WILL COMPLETELY RESET your git directory ... be careful. Don't be silly.
+
 
 *Currently only git is supported, but maybe more are coming. It is a POC afterall.
