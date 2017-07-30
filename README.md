@@ -62,4 +62,11 @@ Just remember, this is a proof of concept. Having said that, here are some proti
 1. vbQ WILL COMPLETELY RESET your git directory ... be careful. Don't be silly.
 
 
+#TODO/Roadmap
+
+1. Refactor VCS, meaning, allow 100% customizations. Update/Commit/Or not ... use it as a flat file Queue.
+1. Alloow for retry/attempt logic
+1. Run the jobs again depending if anything new was added to the queue. mid flight.
+
+
 *Currently only git is supported, but maybe more are coming. It is a POC afterall.
