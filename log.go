@@ -18,7 +18,7 @@ func flushLogs(filename string) {
 func log(t, msg string) {
 	logs += fmt.Sprintln(time.Now().Format(time.RFC3339), strings.ToUpper(t), msg)
 	fmt.Println(time.Now().Format(time.RFC3339), strings.ToUpper(t), msg)
-	if t == "fatal" {
+	if strings.ToLower(t) == "error" {
 		os.Exit(42)
 	}
 }

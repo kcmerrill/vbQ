@@ -12,11 +12,17 @@ import (
 )
 
 type task struct {
-	Name     string
-	File     string
-	Q        string
-	CMD      string
-	Args     map[string]string `yaml:",inline"`
+	// name of the task
+	Name string
+	// file it's located in
+	File string
+	// Q name it's coming from
+	Q string
+	// command to run(work)
+	CMD string
+	// yaml file contents key: value pairings
+	Args map[string]string `yaml:",inline"`
+	// raw contents of the file
 	Contents string
 }
 

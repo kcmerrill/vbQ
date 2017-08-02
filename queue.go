@@ -11,25 +11,37 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func findQs(dir string) []string {
+func findQs(dir, qFileName string) []string {
 	// prep
 	dir = strings.TrimRight(dir, "/")
 
 	// scan
-	files, _ := filepath.Glob(dir + "/**/.q")
+	firstLevel, _ := filepath.Glob(dir + "/*/" + qFileName)
+	// go globs are silly
+	secondLevel, _ := filepath.Glob(dir + "/*/*/" + qFileName)
+
+	// combine everything
+	files := append(firstLevel, secondLevel...)
 
 	// return
 	return files
 }
 
 func startQs(qs []string) bool {
+	// setup our wait groups
 	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
 
+	// cycle through each configured q
 	for _, q := range qs {
 		wgQ.Add(1)
+
+		// work concurrently
 		go func(q string) {
 			defer wgQ.Done()
+			// spin up the q
 			_, wasFailures := newQ(q)
+
+			// if so, we need to return to get correct exit code
 			if wasFailures {
 				wgQLock.Lock()
 				failures = true
@@ -39,32 +51,39 @@ func startQs(qs []string) bool {
 	}
 	wgQ.Wait()
 
+	// return if there were failures
 	return failures
 }
 
 func newQ(qConfigFile string) (bool, bool) {
 	// initalize
 	q := queue{
-		Name:       filepath.Base(filepath.Dir(qConfigFile)),
-		TasksDir:   filepath.Dir(qConfigFile),
+		// the name of the queue(directory)
+		Name: filepath.Base(filepath.Dir(qConfigFile)),
+		// where the tasks are located
+		TasksDir: filepath.Dir(qConfigFile),
+		// the name of the config file, usually .q
 		ConfigFile: qConfigFile,
-		Q:          make(chan task),
-		ShutdownQ:  make(chan bool),
-		lock:       &sync.Mutex{},
+		// 'queue' for golang workers
+		Q: make(chan task),
+		// prep for shutdown
+		ShutdownQ: make(chan bool),
+		// bringing mutexy back
+		lock: &sync.Mutex{},
 	}
 
 	// fetch the file
 	contents, configReadErr := ioutil.ReadFile(q.ConfigFile)
 	if configReadErr != nil {
-		log("fatal", "Unable to read in q config for '"+q.ConfigFile+"'")
 		// do not rerun, and exit 1
+		log("error", "Unable to read in q config for '"+q.ConfigFile+"'")
 		return false, false
 	}
 
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &q)
 	if unmarshalErr != nil {
-		log("fatal", "Unable to unmarshal q config for '"+q.ConfigFile+"\n\n"+unmarshalErr.Error())
+		log("error", "Unable to unmarshal q config for '"+q.ConfigFile+"\n\n"+unmarshalErr.Error())
 	}
 
 	// defaults
@@ -72,9 +91,14 @@ func newQ(qConfigFile string) (bool, bool) {
 		q.WorkerInfo.Count = 1
 	}
 
+	// where to toss the completed tasks
 	if q.QueueInfo.CompletedQ == "" {
 		q.QueueInfo.CompletedQ = ".completed"
 	}
+
+	// notice how there isn't a finished default Q?
+	// that's so the next time vbQ runs, it will rerun the task
+	// feel free and set a failed folder in your configuration
 
 	// spin up our workers
 	for worker := 0; worker < q.WorkerInfo.Count; worker++ {
@@ -91,6 +115,7 @@ func newQ(qConfigFile string) (bool, bool) {
 		log("error", "Error loading tasks for q '"+q.Name+"'")
 	}
 
+	// go through each of the tasks
 	for _, taskInfo := range tasks {
 		// skip over . files, also directories and README's
 		if strings.ToLower(taskInfo.Name()) == "readme.md" || strings.HasPrefix(taskInfo.Name(), ".") || taskInfo.IsDir() {
@@ -99,9 +124,13 @@ func newQ(qConfigFile string) (bool, bool) {
 
 		// Inject our task
 		q.Q <- task{
+			// the file of task contents
 			File: q.TasksDir + "/" + taskInfo.Name(),
-			Q:    q.Name,
-			CMD:  q.WorkerInfo.CMD,
+			// name of the Q it's coming from
+			Q: q.Name,
+			// the worker command to run
+			CMD: q.WorkerInfo.CMD,
+			// any arguments/params the task has given us
 			Args: make(map[string]string),
 		}
 	}
@@ -141,14 +170,19 @@ type queue struct {
 }
 
 func (q *queue) work(id int) {
+	// for as long as it takes
 	for {
 		select {
+		// main loop will send a shutdown signal
 		case <-q.ShutdownQ:
 			return
+		// process the task
 		case task := <-q.Q:
+			// succesfully executed with no errors?
 			if task.run() {
 				q.complete(task)
 			} else {
+				// boo!
 				q.fail(task)
 			}
 		}
@@ -156,6 +190,7 @@ func (q *queue) work(id int) {
 }
 
 func (q *queue) complete(task task) {
+	// completed tasks are simply moved to another directory
 	os.Rename(task.File, filepath.Dir(task.File)+"/"+q.QueueInfo.CompletedQ+"/"+task.Name)
 }
 
