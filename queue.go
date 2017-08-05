@@ -76,14 +76,14 @@ func newQ(qConfigFile string) (bool, bool) {
 	contents, configReadErr := ioutil.ReadFile(q.ConfigFile)
 	if configReadErr != nil {
 		// do not rerun, and exit 1
-		log("error", "Unable to read in q config for '"+q.ConfigFile+"'")
+		log("error", "Unable to read in q config for '"+q.ConfigFile+"'", false)
 		return false, false
 	}
 
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &q)
 	if unmarshalErr != nil {
-		log("error", "Unable to unmarshal q config for '"+q.ConfigFile+"\n\n"+unmarshalErr.Error())
+		log("error", "Unable to unmarshal q config for '"+q.ConfigFile+"\n\n"+unmarshalErr.Error(), false)
 	}
 
 	// defaults
@@ -112,7 +112,7 @@ func newQ(qConfigFile string) (bool, bool) {
 	// load up our tasks
 	tasks, loadTasksErr := ioutil.ReadDir(q.TasksDir)
 	if loadTasksErr != nil {
-		log("error", "Error loading tasks for q '"+q.Name+"'")
+		log("error", "Error loading tasks for q '"+q.Name+"'", true)
 	}
 
 	// go through each of the tasks

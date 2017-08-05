@@ -15,10 +15,10 @@ func flushLogs(filename string) {
 	fmt.Fprintf(file, "%s", logs)
 }
 
-func log(t, msg string) {
+func log(t, msg string, exit bool) {
 	logs += fmt.Sprintln(time.Now().Format(time.RFC3339), strings.ToUpper(t), msg)
 	fmt.Println(time.Now().Format(time.RFC3339), strings.ToUpper(t), msg)
-	if strings.ToLower(t) == "error" {
+	if exit {
 		os.Exit(42)
 	}
 }

@@ -27,7 +27,7 @@ func (v *VCS) init() *VCS {
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &v)
 	if unmarshalErr != nil {
-		log("error", "Unable to parse "+v.ConfigFile+"\n\n"+unmarshalErr.Error())
+		log("error", "Unable to parse "+v.ConfigFile+"\n\n"+unmarshalErr.Error(), true)
 	}
 
 	// init the repo ... and/or queue
@@ -35,7 +35,7 @@ func (v *VCS) init() *VCS {
 		cmd := exec.Command("bash", "-c", v.Init)
 		err := cmd.Run()
 		if err != nil {
-			log("error", "Initilization failed")
+			log("error", "Initilization failed", true)
 		}
 	}
 
@@ -47,7 +47,7 @@ func (v *VCS) commit() {
 		cmd := exec.Command("bash", "-c", v.Commit)
 		err := cmd.Run()
 		if err != nil {
-			log("error", "Commit failed")
+			log("error", "Commit failed", true)
 		}
 	}
 }

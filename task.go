@@ -47,7 +47,7 @@ func (t *task) run() bool {
 	}
 	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
-		log("failed[template]", t.Q+":"+t.Name)
+		log("failed[template]", t.Q+":"+t.Name, false)
 		return false
 	}
 
@@ -55,7 +55,7 @@ func (t *task) run() bool {
 	cmdParsed := new(bytes.Buffer)
 	executionErr := tmpl.Execute(cmdParsed, t)
 	if executionErr != nil {
-		log("failed[arguments]", t.Q+":"+t.Name)
+		log("failed[arguments]", t.Q+":"+t.Name, false)
 		return false
 	}
 
@@ -63,12 +63,12 @@ func (t *task) run() bool {
 	cmd := exec.Command("bash", "-c", cmdParsed.String())
 	err := cmd.Run()
 	if err != nil {
-		log("failed", t.Q+":"+t.Name)
+		log("failed", t.Q+":"+t.Name, false)
 		return false
 	}
 
 	// success! #lifegoals
-	log("completed", t.Q+":"+t.Name)
+	log("completed", t.Q+":"+t.Name, false)
 	return true
 }
 

@@ -34,8 +34,8 @@ func TestFlushLogs(t *testing.T) {
 func TestLog(t *testing.T) {
 	// reset
 	logs = ""
-	log("info", "kc was here")
-	log("bingo", "washisnameo")
+	log("info", "kc was here", false)
+	log("bingo", "washisnameo", false)
 
 	if !strings.Contains(logs, "kc was here") {
 		t.Fatalf("Expected info to be written")
