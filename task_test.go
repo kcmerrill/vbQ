@@ -36,7 +36,7 @@ func TestRunSuccess(t *testing.T) {
 	}
 
 	fmt.Println(string(results))
-	if strings.trimspace(string(results)) != "testTask kcmerrill kcmerrill@gmail.com" {
+	if strings.TrimSpace(string(results)) != "testTask kcmerrill kcmerrill@gmail.com" {
 		golog.Fatalf("The task command does not relfect expected output.")
 	}
 }

@@ -24,6 +24,9 @@ func (v *VCS) init() *VCS {
 	// fetch the file, if not, treat it like a reqular q(no vcs backing)
 	contents, _ := ioutil.ReadFile(v.ConfigFile)
 
+	// set default log
+	v.log = ".log"
+
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &v)
 	if unmarshalErr != nil {

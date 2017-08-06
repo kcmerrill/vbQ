@@ -16,12 +16,16 @@ func findQs(dir, qFileName string) []string {
 	dir = strings.TrimRight(dir, "/")
 
 	// scan
+	// current directory
+	thisLevel, _ := filepath.Glob(dir + "/" + qFileName)
+	// first level
 	firstLevel, _ := filepath.Glob(dir + "/*/" + qFileName)
-	// go globs are silly
+	// yeah yeah ... go globs are silly
 	secondLevel, _ := filepath.Glob(dir + "/*/*/" + qFileName)
 
 	// combine everything
-	files := append(firstLevel, secondLevel...)
+	files := append(thisLevel, firstLevel...)
+	files = append(files, secondLevel...)
 
 	// return
 	return files
