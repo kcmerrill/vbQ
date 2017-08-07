@@ -1,7 +1,5 @@
 language: go
-
 go:
     - 1.9
-
 script:
     - go test $(go list ./... | grep -v /vendor/)
