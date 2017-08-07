@@ -35,31 +35,38 @@ func startQs(qs []string) bool {
 	// setup our wait groups
 	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
 
-	// cycle through each configured q
-	for _, q := range qs {
-		wgQ.Add(1)
+	for {
+		processed := 0
+		// cycle through each configured q
+		for _, q := range qs {
+			wgQ.Add(1)
 
-		// work concurrently
-		go func(q string) {
-			defer wgQ.Done()
-			// spin up the q
-			_, wasFailures := newQ(q)
+			// work concurrently
+			go func(q string) {
+				defer wgQ.Done()
+				// spin up the q
+				p, wasFailures := newQ(q)
+				processed += p
+				// if so, we need to return to get correct exit code
+				if wasFailures {
+					wgQLock.Lock()
+					failures = true
+					wgQLock.Unlock()
+				}
+			}(q)
+		}
+		wgQ.Wait()
 
-			// if so, we need to return to get correct exit code
-			if wasFailures {
-				wgQLock.Lock()
-				failures = true
-				wgQLock.Unlock()
-			}
-		}(q)
+		if processed == 0 {
+			break
+		}
 	}
-	wgQ.Wait()
 
 	// return if there were failures
 	return failures
 }
 
-func newQ(qConfigFile string) (bool, bool) {
+func newQ(qConfigFile string) (int, bool) {
 	// initalize
 	q := queue{
 		// the name of the queue(directory)
@@ -76,12 +83,22 @@ func newQ(qConfigFile string) (bool, bool) {
 		lock: &sync.Mutex{},
 	}
 
+	// running in the current directory?
+	if q.Name == "." {
+		// absolute file path
+		actualQPath, actualQPathError := filepath.Abs(".")
+		if actualQPathError == nil {
+			// if we found something, lets use it.
+			q.Name = filepath.Base(actualQPath)
+		}
+	}
+
 	// fetch the file
 	contents, configReadErr := ioutil.ReadFile(q.ConfigFile)
 	if configReadErr != nil {
 		// do not rerun, and exit 1
 		log("error", "Unable to read in q config for '"+q.ConfigFile+"'", false)
-		return false, false
+		return q.tasks, false
 	}
 
 	// parse
@@ -137,6 +154,9 @@ func newQ(qConfigFile string) (bool, bool) {
 			// any arguments/params the task has given us
 			Args: make(map[string]string),
 		}
+
+		// increment the tasks counter
+		q.tasks++
 	}
 
 	// shutdown our workers
@@ -145,7 +165,7 @@ func newQ(qConfigFile string) (bool, bool) {
 	}
 
 	// well?
-	return false, q.wasFailures
+	return q.tasks, q.wasFailures
 }
 
 // queue contains information about specific queue
@@ -157,6 +177,7 @@ type queue struct {
 	TasksDir    string
 	wasFailures bool
 	lock        *sync.Mutex
+	tasks       int
 
 	// queues to place messages
 	Q         chan task
