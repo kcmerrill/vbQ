@@ -36,11 +36,11 @@ func startQs(qs []string) bool {
 	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
 
 	for {
+		failures := false
 		processed := 0
 		// cycle through each configured q
 		for _, q := range qs {
 			wgQ.Add(1)
-
 			// work concurrently
 			go func(q string) {
 				defer wgQ.Done()
@@ -56,8 +56,7 @@ func startQs(qs []string) bool {
 			}(q)
 		}
 		wgQ.Wait()
-
-		if processed == 0 {
+		if processed == 0 || failures {
 			break
 		}
 	}
