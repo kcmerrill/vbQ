@@ -5,8 +5,10 @@ import (
 	"errors"
 	"html/template"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -24,6 +26,8 @@ type task struct {
 	Args map[string]string `yaml:",inline"`
 	// raw contents of the file
 	Contents string
+	// verbose mode?
+	Verbose bool
 }
 
 func (t *task) run() bool {
@@ -59,8 +63,17 @@ func (t *task) run() bool {
 		return false
 	}
 
+	// TODO: HACK, REMOVE
+	cmdScrubbed := strings.Replace(cmdParsed.String(), "&lt;", "<", -1)
+
 	// actually run the task now
-	cmd := exec.Command("bash", "-c", cmdParsed.String())
+	cmd := exec.Command("bash", "-c", cmdScrubbed)
+	if t.Verbose {
+		// send everything out!
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
 	err := cmd.Run()
 	if err != nil {
 		log("failed", t.Q+":"+t.Name, false)
