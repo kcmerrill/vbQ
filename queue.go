@@ -36,7 +36,6 @@ func startQs(qs []string) bool {
 	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
 
 	for {
-		failures := false
 		processed := 0
 		// cycle through each configured q
 		for _, q := range qs {
@@ -97,13 +96,20 @@ func newQ(qConfigFile string) (int, bool) {
 	if configReadErr != nil {
 		// do not rerun, and exit 1
 		log("error", "Unable to read in q config for '"+q.ConfigFile+"'", false)
-		return q.tasks, false
+		return q.tasks, true
 	}
 
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &q)
 	if unmarshalErr != nil {
 		log("error", "Unable to unmarshal q config for '"+q.ConfigFile+"\n\n"+unmarshalErr.Error(), false)
+		return q.tasks, true
+	}
+
+	// if command is empty, bail
+	if q.WorkerInfo.CMD == "" {
+		log("error", "'command' not set for workers in q '"+q.Name+"'", false)
+		return q.tasks, true
 	}
 
 	// defaults
@@ -133,12 +139,16 @@ func newQ(qConfigFile string) (int, bool) {
 	tasks, loadTasksErr := ioutil.ReadDir(q.TasksDir)
 	if loadTasksErr != nil {
 		log("error", "Error loading tasks for q '"+q.Name+"'", true)
+		return q.tasks, true
 	}
 
 	// go through each of the tasks
 	for _, taskInfo := range tasks {
 		// skip over . files, also directories and README's
-		if strings.ToLower(taskInfo.Name()) == "readme.md" || strings.HasPrefix(taskInfo.Name(), ".") || taskInfo.IsDir() {
+		if strings.ToLower(taskInfo.Name()) == "readme.md" ||
+			strings.HasSuffix(taskInfo.Name(), ".template.yml") ||
+			strings.HasPrefix(taskInfo.Name(), ".") ||
+			taskInfo.IsDir() {
 			continue
 		}
 
@@ -195,7 +205,7 @@ type queue struct {
 	// worker information
 	WorkerInfo struct {
 		Count int    `yaml:"count"`
-		CMD   string `yaml:"cmd"`
+		CMD   string `yaml:"command"`
 	} `yaml:"workers"`
 }
 

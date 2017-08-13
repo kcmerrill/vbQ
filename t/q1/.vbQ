@@ -1,4 +1,0 @@
-init: |
-    touch /tmp/init
-commit: |
-    touch /tmp/commit

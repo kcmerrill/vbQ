@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rs/xid"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -47,7 +48,8 @@ func (t *task) run() bool {
 	// the true test will be if any of those args gets used
 	// elsewhere
 	fns := template.FuncMap{
-		"task": taskParams,
+		"task":   taskParams,
+		"uniqId": uniqID,
 	}
 	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
@@ -91,4 +93,8 @@ func taskParams(m map[string]string, key string) (interface{}, error) {
 		return nil, errors.New("missing key " + key)
 	}
 	return val, nil
+}
+
+func uniqID(m map[string]string, key string) (interface{}, error) {
+	return xid.New().String(), nil
 }

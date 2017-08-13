@@ -12,27 +12,27 @@ func TestVCSInitCommit(t *testing.T) {
 	os.Remove("/tmp/commit")
 
 	vcs := &VCS{
-		ConfigFile: "t/q1/.vbQ",
+		ConfigFile: "t/queues/test_vcs/.vbQ",
 	}
 
-	// test out init
-	vcs.init()
+	// test out startup
+	vcs.startup()
 
-	// ok, /tmp/init should exist
-	if _, err := os.Stat("/tmp/init"); os.IsNotExist(err) {
-		golog.Fatalf("init() did not run properly")
+	// ok, /tmp/vcs_test_startup should exist
+	if _, err := os.Stat("/tmp/test_vcs_startup"); os.IsNotExist(err) {
+		golog.Fatalf("startup() did not run properly")
 	}
 
-	// run commit
-	vcs.commit()
+	// run shutdown
+	vcs.shutdown()
 
-	// test out commit
-	if _, err := os.Stat("/tmp/commit"); os.IsNotExist(err) {
-		golog.Fatalf("commit() did not run properly")
+	// test out shutdown
+	if _, err := os.Stat("/tmp/test_vcs_shutdown"); os.IsNotExist(err) {
+		golog.Fatalf("shutdown() did not run properly")
 	}
 
-	// lazy, but make sure the .log exists
-	if _, err := os.Stat("t/q1/.log"); os.IsNotExist(err) {
+	// Make sure the .log exists
+	if _, err := os.Stat("t/queues/test_vcs/.log"); os.IsNotExist(err) {
 		golog.Fatalf("Expecting .log to exist")
 	}
 }

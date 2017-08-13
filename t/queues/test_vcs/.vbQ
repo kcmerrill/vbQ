@@ -1,0 +1,4 @@
+startup: |
+    touch /tmp/test_vcs_startup
+shutdown: |
+    touch /tmp/test_vcs_shutdown

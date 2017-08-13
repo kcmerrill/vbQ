@@ -15,12 +15,12 @@ func NewVCS(configFile string) *VCS {
 // VCS our commands needed for pre/post hooks
 type VCS struct {
 	ConfigFile string
-	Init       string `yaml:"init"`
-	Commit     string `yaml:"commit"`
+	Startup    string `yaml:"startup"`
+	Shutdown   string `yaml:"shutdown"`
 	log        string `yaml:"log"`
 }
 
-func (v *VCS) init() *VCS {
+func (v *VCS) startup() *VCS {
 	// fetch the file, if not, treat it like a reqular q(no vcs backing)
 	contents, _ := ioutil.ReadFile(v.ConfigFile)
 
@@ -33,9 +33,9 @@ func (v *VCS) init() *VCS {
 		log("error", "Unable to parse "+v.ConfigFile+"\n\n"+unmarshalErr.Error(), true)
 	}
 
-	// init the repo ... and/or queue
-	if v.Init != "" {
-		cmd := exec.Command("bash", "-c", v.Init)
+	// startup the repo ... and/or queue
+	if v.Startup != "" {
+		cmd := exec.Command("bash", "-c", v.Startup)
 		err := cmd.Run()
 		if err != nil {
 			log("error", "Initilization failed", true)
@@ -45,9 +45,9 @@ func (v *VCS) init() *VCS {
 	return v
 }
 
-func (v *VCS) commit() {
-	if v.Commit != "" {
-		cmd := exec.Command("bash", "-c", v.Commit)
+func (v *VCS) shutdown() {
+	if v.Shutdown != "" {
+		cmd := exec.Command("bash", "-c", v.Shutdown)
 		err := cmd.Run()
 		if err != nil {
 			log("error", "Commit failed", true)

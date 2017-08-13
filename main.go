@@ -36,7 +36,7 @@ func main() {
 
 	// switch dirs
 	os.Chdir(*dir)
-	v := NewVCS(*vbQConfigFileName).init()
+	v := NewVCS(*vbQConfigFileName).startup()
 
 	// TODO: implement qConfigFileName
 	startQs(findQs(".", ".q"))
@@ -44,6 +44,6 @@ func main() {
 	// flush the logs
 	flushLogs(v.log)
 
-	// commit the goods
-	v.commit()
+	// shutdown
+	v.shutdown()
 }
