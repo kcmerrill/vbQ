@@ -1,7 +1,5 @@
 ![vbQ](assets/vbQ.png "vbQ")
 
-# vbQ
-
 At it's core vbQ is a simple flat file queue system. Queues are just folders, tasks are just files inside of said folders. Workers are bash commands so you can be as creative as you need to be. Tasks will continue to be processed so long as tasks are available.
 
 # Why?
