@@ -53,7 +53,7 @@ func (t *task) run() bool {
 	}
 	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
-		log("failed[template]", t.Q+":"+t.Name, false)
+		log("failed[template]", parseErr.Error(), false)
 		return false
 	}
 
@@ -61,7 +61,7 @@ func (t *task) run() bool {
 	cmdParsed := new(bytes.Buffer)
 	executionErr := tmpl.Execute(cmdParsed, t)
 	if executionErr != nil {
-		log("failed[arguments]", t.Q+":"+t.Name, false)
+		log("failed[arguments]", executionErr.Error(), false)
 		return false
 	}
 
@@ -95,6 +95,6 @@ func taskParams(m map[string]string, key string) (interface{}, error) {
 	return val, nil
 }
 
-func uniqID(m map[string]string, key string) (interface{}, error) {
+func uniqID() (interface{}, error) {
 	return xid.New().String(), nil
 }
