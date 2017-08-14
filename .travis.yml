@@ -5,3 +5,6 @@ go:
 
 script:
     - go test $(go list ./... | grep -v /vendor/)
+    
+env:
+  CODECLIMATE_REPO_TOKEN: 84caa54da768b76335c3b08ef7c3afd891d54f8d18255cb021a8f3b8cd5a58f1
