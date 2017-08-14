@@ -56,6 +56,6 @@ func TestStartQErrorsWithWorkers(t *testing.T) {
 func TestStartQErrorsWithQConfigMissingCMD(t *testing.T) {
 	wasFailures := startQs([]string{"t/queues/errors.with.workers/.q"})
 	if !wasFailures {
-		golog.Fatalf("[errors.with.workers] Expecting an error when 'commnd' is not set")
+		golog.Fatalf("[errors.with.workers] Expecting an error when 'command' is not set")
 	}
 }

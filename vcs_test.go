@@ -8,8 +8,8 @@ import (
 
 func TestVCSInitCommit(t *testing.T) {
 	// cleanup old tests ...
-	os.Remove("/tmp/init")
-	os.Remove("/tmp/commit")
+	os.Remove("/tmp/startup")
+	os.Remove("/tmp/shutdown")
 
 	vcs := &VCS{
 		ConfigFile: "t/queues/test_vcs/.vbQ",
@@ -29,10 +29,5 @@ func TestVCSInitCommit(t *testing.T) {
 	// test out shutdown
 	if _, err := os.Stat("/tmp/test_vcs_shutdown"); os.IsNotExist(err) {
 		golog.Fatalf("shutdown() did not run properly")
-	}
-
-	// Make sure the .log exists
-	if _, err := os.Stat("t/queues/test_vcs/.log"); os.IsNotExist(err) {
-		golog.Fatalf("Expecting .log to exist")
 	}
 }

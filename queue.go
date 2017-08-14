@@ -148,6 +148,7 @@ func newQ(qConfigFile string) (int, bool) {
 		if strings.ToLower(taskInfo.Name()) == "readme.md" ||
 			strings.HasSuffix(taskInfo.Name(), ".template.yml") ||
 			strings.HasPrefix(taskInfo.Name(), ".") ||
+			taskInfo.Name() == qConfigFile ||
 			taskInfo.IsDir() {
 			continue
 		}

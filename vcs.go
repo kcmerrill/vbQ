@@ -17,7 +17,7 @@ type VCS struct {
 	ConfigFile string
 	Startup    string `yaml:"startup"`
 	Shutdown   string `yaml:"shutdown"`
-	log        string `yaml:"log"`
+	Log        string `yaml:"log"`
 }
 
 func (v *VCS) startup() *VCS {
@@ -25,7 +25,9 @@ func (v *VCS) startup() *VCS {
 	contents, _ := ioutil.ReadFile(v.ConfigFile)
 
 	// set default log
-	v.log = ".log"
+	if v.Log == "" {
+		v.Log = ".log"
+	}
 
 	// parse
 	unmarshalErr := yaml.Unmarshal([]byte(contents), &v)

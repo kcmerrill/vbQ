@@ -15,7 +15,8 @@ var (
 
 func main() {
 	// setup some simple flags
-	vbQConfigFileName := flag.String("vbQ", ".vbQ", "The main vbQ configuration filename")
+	vbQConfigFileName := flag.String("vbQConfig", ".vbQ", "The main vbQ configuration filename")
+	vbQQueueConfigFileName := flag.String("qConfig", ".q", "The config file name to recognize queues")
 	dir := flag.String("dir", ".", "Directory to run from")
 	help := flag.Bool("help", false, "Display vbQ help")
 	version := flag.Bool("version", false, "Display vbQ version")
@@ -39,10 +40,10 @@ func main() {
 	v := NewVCS(*vbQConfigFileName).startup()
 
 	// TODO: implement qConfigFileName
-	startQs(findQs(".", ".q"))
+	startQs(findQs(".", *vbQQueueConfigFileName))
 
 	// flush the logs
-	flushLogs(v.log)
+	flushLogs(v.Log)
 
 	// shutdown
 	v.shutdown()
