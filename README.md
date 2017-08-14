@@ -8,15 +8,7 @@ If you have a folder with a bunch of bash scripts that need to be manually run o
 
 # The vision
 
-Lets use an example to onboard a new engineer. Quite a few steps might need to be done. Creating AWS credentials, adding said user to MySQL, provisioning dev/test/stage environments. Depending on how your processes are setup, IT will provision a laptop and then create a number of tickets to various departments. Instead, create a PR, send it to the appropriate people as reviewers, hit merge and a few minutes later the user is setup. 
-
-The idea is to automate everything through pull requests.
-
-# Why not just use build pipelines?
-
-Great question. You absolutely can use jenkins/travis/other build systems and the end goal would be identical. This is a bit easier however, so it's up to you and personal taste. 
-
-Instead of triggering downstream builds, you'd simply touch/create a file in a different queue. Again, personal preference. Another thing is, all the tasks are stored via files, so it's incredibly simple to rerun everything again if for whatever reason it would need to be rerun(emergency setup, disaster recover, etc ...)
+Everything is automated and everything is automated through a `pull request`.
 
 ## vbQ Configuration file(default: '.vbQ', optional)
 
@@ -77,7 +69,7 @@ something: >
     elsewouldgohere
 ```
 
-# ProTips
+### ProTips
 
 1. vbQ should be automated itself! With Jenkins/Build system based off of PR's!
 1. Your build system should only allow for 1 build at a time and _NOT_ setup for multiple builds concurrently.
