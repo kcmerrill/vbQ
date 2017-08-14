@@ -1,3 +1,5 @@
 package: github.com/kcmerrill/vbQ
 import:
+- package: github.com/rs/xid
+  version: ^1.1.0
 - package: gopkg.in/yaml.v2
