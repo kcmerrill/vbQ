@@ -40,7 +40,7 @@ func (v *VCS) startup() *VCS {
 		cmd := exec.Command("bash", "-c", v.Startup)
 		err := cmd.Run()
 		if err != nil {
-			log("error", "Initilization failed", true)
+			log("error", "Startup failed", true)
 		}
 	}
 
@@ -52,7 +52,7 @@ func (v *VCS) shutdown() {
 		cmd := exec.Command("bash", "-c", v.Shutdown)
 		err := cmd.Run()
 		if err != nil {
-			log("error", "Commit failed", true)
+			log("error", "Shutdown failed", true)
 		}
 	}
 }

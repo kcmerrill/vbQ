@@ -31,7 +31,7 @@ func findQs(dir, qFileName string) []string {
 	return files
 }
 
-func startQs(qs []string) bool {
+func startQs(qs []string, dryRun bool) bool {
 	// setup our wait groups
 	wgQ, wgQLock, failures := sync.WaitGroup{}, &sync.Mutex{}, false
 
@@ -44,7 +44,7 @@ func startQs(qs []string) bool {
 			go func(q string) {
 				defer wgQ.Done()
 				// spin up the q
-				p, wasFailures := newQ(q)
+				p, wasFailures := newQ(q, dryRun)
 				processed += p
 				// if so, we need to return to get correct exit code
 				if wasFailures {
@@ -64,7 +64,7 @@ func startQs(qs []string) bool {
 	return failures
 }
 
-func newQ(qConfigFile string) (int, bool) {
+func newQ(qConfigFile string, dryRun bool) (int, bool) {
 	// initalize
 	q := queue{
 		// the name of the queue(directory)
@@ -165,6 +165,8 @@ func newQ(qConfigFile string) (int, bool) {
 			Args: make(map[string]string),
 			// verbose mode?
 			Verbose: q.WorkerInfo.Verbose,
+			// dryrun mode
+			DryRun: dryRun,
 		}
 
 		// increment the tasks counter

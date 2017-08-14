@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rs/xid"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -29,6 +28,8 @@ type task struct {
 	Contents string
 	// verbose mode?
 	Verbose bool
+	// dry run
+	DryRun bool
 }
 
 func (t *task) run() bool {
@@ -48,12 +49,11 @@ func (t *task) run() bool {
 	// the true test will be if any of those args gets used
 	// elsewhere
 	fns := template.FuncMap{
-		"task":   taskParams,
-		"uniqId": uniqID,
+		"task": taskParams,
 	}
 	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
-		log("failed[template]", parseErr.Error(), false)
+		log("failed[template]", t.Q+":"+t.Name, false)
 		return false
 	}
 
@@ -61,14 +61,14 @@ func (t *task) run() bool {
 	cmdParsed := new(bytes.Buffer)
 	executionErr := tmpl.Execute(cmdParsed, t)
 	if executionErr != nil {
-		log("failed[arguments]", executionErr.Error(), false)
+		log("missing/invalid[arguments]", t.Q+":"+t.Name, false)
 		return false
 	}
 
 	// TODO: HACK, REMOVE
 	cmdScrubbed := strings.Replace(cmdParsed.String(), "&lt;", "<", -1)
 
-	// actually run the task now
+	// setup the task
 	cmd := exec.Command("bash", "-c", cmdScrubbed)
 	if t.Verbose {
 		// send everything out!
@@ -76,10 +76,13 @@ func (t *task) run() bool {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
-		log("failed", t.Q+":"+t.Name, false)
-		return false
+	// do not execute the command if it's a dry run
+	if !t.DryRun {
+		err := cmd.Run()
+		if err != nil {
+			log("failed", t.Q+":"+t.Name, false)
+			return false
+		}
 	}
 
 	// success! #lifegoals
@@ -93,8 +96,4 @@ func taskParams(m map[string]string, key string) (interface{}, error) {
 		return nil, errors.New("missing key " + key)
 	}
 	return val, nil
-}
-
-func uniqID() (interface{}, error) {
-	return xid.New().String(), nil
 }

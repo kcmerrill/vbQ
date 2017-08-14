@@ -19,6 +19,7 @@ func main() {
 	vbQQueueConfigFileName := flag.String("qConfig", ".q", "The config file name to recognize queues")
 	dir := flag.String("dir", ".", "Directory to run from")
 	help := flag.Bool("help", false, "Display vbQ help")
+	dryRun := flag.Bool("dry-run", false, "Dry run when enabled will not run the command")
 	version := flag.Bool("version", false, "Display vbQ version")
 	flag.Parse()
 
@@ -40,11 +41,13 @@ func main() {
 	v := NewVCS(*vbQConfigFileName).startup()
 
 	// TODO: implement qConfigFileName
-	startQs(findQs(".", *vbQQueueConfigFileName))
+	startQs(findQs(".", *vbQQueueConfigFileName), *dryRun)
 
-	// flush the logs
-	flushLogs(v.Log)
+	if !*dryRun {
+		// flush the logs
+		flushLogs(v.Log)
 
-	// shutdown
-	v.shutdown()
+		// shutdown
+		v.shutdown()
+	}
 }

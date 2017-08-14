@@ -26,7 +26,7 @@ func TestStartQSuccesful(t *testing.T) {
 	ioutil.WriteFile("t/queues/basic/"+taskID, []byte(""), 0644)
 	ioutil.WriteFile("/tmp/"+taskID, []byte(""), 0644)
 
-	wasFailures := startQs([]string{"t/queues/basic/.q"})
+	wasFailures := startQs([]string{"t/queues/basic/.q"}, false)
 	if wasFailures {
 		golog.Fatalf("Failures with running queues.")
 	}
@@ -47,14 +47,14 @@ func TestStartQSuccesful(t *testing.T) {
 
 func TestStartQErrorsWithWorkers(t *testing.T) {
 	// generate a task
-	wasFailures := startQs([]string{"t/queues/errors/.q"})
+	wasFailures := startQs([]string{"t/queues/errors/.q"}, false)
 	if !wasFailures {
 		golog.Fatalf("[errors] Expecting errors with startingQs with bad tasks")
 	}
 }
 
 func TestStartQErrorsWithQConfigMissingCMD(t *testing.T) {
-	wasFailures := startQs([]string{"t/queues/errors.with.workers/.q"})
+	wasFailures := startQs([]string{"t/queues/errors.with.workers/.q"}, false)
 	if !wasFailures {
 		golog.Fatalf("[errors.with.workers] Expecting an error when 'command' is not set")
 	}
