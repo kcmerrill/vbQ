@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kcmerrill/vbQ.svg?branch=master)](https://travis-ci.org/kcmerrill/vbQ)[![Go Report Card](https://goreportcard.com/badge/github.com/kcmerrill/vbQ)](https://goreportcard.com/report/github.com/kcmerrill/vbQ)
+[![Build Status](https://travis-ci.org/kcmerrill/vbQ.svg?branch=master)](https://travis-ci.org/kcmerrill/vbQ) [![Go Report Card](https://goreportcard.com/badge/github.com/kcmerrill/vbQ)](https://goreportcard.com/report/github.com/kcmerrill/vbQ)
 ![vbQ](assets/vbQ.png "vbQ")
 
 At it's core vbQ is a simple flat file queue system. Queues are just folders, tasks are just files inside of said folders. Workers are bash commands so you can be as creative as you need to be. Tasks will continue to be processed so long as tasks are available.
