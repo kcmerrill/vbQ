@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/kcmerrill/vbQ.svg?branch=master)](https://travis-ci.org/kcmerrill/vbQ)
 ![vbQ](assets/vbQ.png "vbQ")
 
 At it's core vbQ is a simple flat file queue system. Queues are just folders, tasks are just files inside of said folders. Workers are bash commands so you can be as creative as you need to be. Tasks will continue to be processed so long as tasks are available.
