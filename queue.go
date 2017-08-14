@@ -164,7 +164,7 @@ func newQ(qConfigFile string) (int, bool) {
 			// any arguments/params the task has given us
 			Args: make(map[string]string),
 			// verbose mode?
-			Verbose: q.Verbose,
+			Verbose: q.WorkerInfo.Verbose,
 		}
 
 		// increment the tasks counter
@@ -186,9 +186,7 @@ type queue struct {
 	// name of the queue
 	Name string `yaml:"name"`
 	// description of the queue
-	Desc string `yaml:"description"`
-	// show errors/success?
-	Verbose     bool `yaml:"verbose"`
+	Desc        string `yaml:"description"`
 	ConfigFile  string
 	TasksDir    string
 	wasFailures bool
@@ -205,8 +203,10 @@ type queue struct {
 
 	// worker information
 	WorkerInfo struct {
-		Count int    `yaml:"count"`
-		CMD   string `yaml:"command"`
+		// show errors/success?
+		Verbose bool   `yaml:"verbose"`
+		Count   int    `yaml:"count"`
+		CMD     string `yaml:"command"`
 	} `yaml:"workers"`
 }
 
