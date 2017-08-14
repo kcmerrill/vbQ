@@ -65,7 +65,7 @@ func (t *task) run() bool {
 		return false
 	}
 
-	// TODO: HACK, REMOVE
+	// TODO: HACK, Lets figure out the right way to fix this
 	cmdScrubbed := strings.Replace(cmdParsed.String(), "&lt;", "<", -1)
 
 	// setup the task
