@@ -9,9 +9,6 @@ At it's core vbQ is a simple flat file queue system. Queues are just folders, ta
 
 If you have a folder with a bunch of bash scripts that need to be manually run or perhaps you have a wiki with instructions you have to follow then you'll understand why. Any tasks that can be automated should be automated, and a lot of the times you get to do it simply because you have the permissions to do so. Need to setup that new github repo? Need to add a new chef user? What about adding those public ssh keys to test/stage/prod boxes? Automate it!
 
-# The vision
-
-Everything is automated and everything is automated through a `pull request`.
 
 ## vbQ Configuration file(default: '.vbQ', optional)
 
