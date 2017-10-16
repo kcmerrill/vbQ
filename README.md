@@ -78,3 +78,12 @@ something: >
 1. Trigger sequential steps by creating task files upon completion. 
 1. dotfiles/README.md/folders/.template.yml are all ignored and not considered tasks. Only files. Even zips. Be creative.
 1. Speaking of readme files, place a README.md on the same level as your `.q` file and put a basic message template in place so those creating the PR's can just copy paste without leaving github. Or create a `file.template.yml`  as all `*.template.yml` files are ignored
+
+## Binaries || Installation
+
+[![MacOSX](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/apple_logo.png "Mac OSX")](http://go-dist.kcmerrill.com/kcmerrill/vbQ/mac/amd64) [![Linux](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/linux_logo.png "Linux")](http://go-dist.kcmerrill.com/kcmerrill/vbQ/linux/amd64)
+
+via go:
+
+`$ go get -u github.com/kcmerrill/vbQ`
+
