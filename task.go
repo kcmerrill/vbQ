@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"errors"
-	"html/template"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
+	"github.com/Masterminds/sprig"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -51,7 +52,8 @@ func (t *task) run() bool {
 	fns := template.FuncMap{
 		"task": taskParams,
 	}
-	tmpl, parseErr := template.New("params").Funcs(fns).Parse(t.CMD)
+
+	tmpl, parseErr := template.New("params").Funcs(sprig.TxtFuncMap()).Funcs(fns).Parse(t.CMD)
 	if parseErr != nil {
 		log("failed[template]", t.Q+":"+t.Name, false)
 		return false

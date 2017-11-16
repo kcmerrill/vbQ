@@ -1,5 +1,8 @@
 package: github.com/kcmerrill/vbQ
 import:
+- package: github.com/Masterminds/sprig
+  version: ^2.14.0
+- package: gopkg.in/yaml.v2
+testImport:
 - package: github.com/rs/xid
   version: ^1.1.0
-- package: gopkg.in/yaml.v2
