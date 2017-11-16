@@ -1,25 +1,8 @@
-hash: 226983526ddba98cb0a27c5326840b26f5a91cde22ffb638713c698dfaca8d6e
-updated: 2017-11-16T15:35:35.115652778-07:00
+hash: fc269a131f4e69f5289c13a128899a9903a1242b2b110b672c4056178abecb40
+updated: 2017-08-13T21:12:10.733295987-06:00
 imports:
-- name: github.com/aokoli/goutils
-  version: 3391d3790d23d03408670993e957e8f408993c34
-- name: github.com/huandu/xstrings
-  version: d6590c0c31d16526217fa60fbd2067f7afcd78c5
-- name: github.com/imdario/mergo
-  version: 7fe0c75c13abdee74b09fcacef5ea1c6bba6a874
-- name: github.com/Masterminds/semver
-  version: 59c29afe1a994eacb71c833025ca7acf874bb1da
-- name: github.com/Masterminds/sprig
-  version: efda631a76d70875162cdc25ffa0d0164bf69758
-- name: github.com/satori/go.uuid
-  version: 879c5887cd475cd7864858769793b2ceb0d44feb
-- name: golang.org/x/crypto
-  version: 81e90905daefcd6fd217b62423c0908922eadb30
-  subpackages:
-  - pbkdf2
-  - scrypt
-- name: gopkg.in/yaml.v2
-  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
-testImports:
 - name: github.com/rs/xid
   version: 02dd45c33376f85d1064355dc790dcc4850596b1
+- name: gopkg.in/yaml.v2
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+testImports: []
