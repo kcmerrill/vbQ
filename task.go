@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"errors"
-	"html/template"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
